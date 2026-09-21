@@ -1,2 +1,16 @@
+[project]
+name = "cybertrace-poc"
+version = "0.1.0"
+description = "CYBERTRACE - AI-Powered Unified Cyber Fraud Analysis & Digital Artifact Correlator"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "pandas",
+    "networkx",
+    "pydantic",
+    "python-multipart"
+]
+
 [tool.vercel]
 entrypoint = "backend.main:app"
