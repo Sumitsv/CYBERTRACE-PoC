@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CYBERTRACE — Unified Cyber Fraud Correlator</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Cytoscape.js for High-Performance Network Graphs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.26.0/cytoscape.min.js"></script>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body
+    class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-mono selection:bg-cyan-500 selection:text-black"
+  >
+    <!-- HEADER / NAVIGATION -->
+    <header
+      class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50 px-6 py-3 flex items-center justify-between"
+    >
+      <div class="flex items-center space-x-3">
+        <div
+          class="h-8 w-8 rounded bg-cyan-500/20 border border-cyan-400 flex items-center justify-center text-cyan-400 font-bold"
+        >
+          CT
+        </div>
+        <div>
+          <h1
+            class="text-lg font-bold tracking-wider text-cyan-400 flex items-center gap-2"
+          >
+            CYBERTRACE
+            <span
+              class="text-xs px-2 py-0.5 rounded bg-cyan-950 border border-cyan-800 text-cyan-300 font-normal"
+              >v1.0 PoC</span
+            >
+          </h1>
+          <p class="text-xs text-slate-400">
+            AI-Powered Unified Cyber Fraud Analysis & Digital Artifact
+            Correlator
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <span
+          class="text-xs text-amber-400/90 bg-amber-950/40 border border-amber-800/60 px-3 py-1 rounded"
+        >
+          ⚠️ Synthetic Demo Evidence — Not Real Investigative Data
+        </span>
+        <button
+          id="load-demo-btn"
+          class="bg-cyan-600 hover:bg-cyan-500 text-black font-bold text-xs px-4 py-2 rounded shadow-lg shadow-cyan-950 transition flex items-center gap-2"
+        >
+          ⚡ LOAD SYNTHETIC EVIDENCE
+        </button>
+        <label
+          class="cursor-pointer bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-3 py-2 rounded border border-slate-700"
+        >
+          📁 Upload CSV
+          <input type="file" id="file-upload" accept=".csv" class="hidden" />
+        </label>
+      </div>
+    </header>
+
+    <!-- MAIN WORKSPACE -->
+    <main
+      class="flex-1 p-6 grid grid-cols-12 gap-6 max-w-[1800px] mx-auto w-full"
+    >
+      <!-- TOP STATS ROW -->
+      <div class="col-span-12 grid grid-cols-4 gap-4">
+        <div class="bg-slate-900 border border-slate-800 p-4 rounded-lg">
+          <div class="text-xs text-slate-400 mb-1">EVIDENCE RECORDS</div>
+          <div id="stat-records" class="text-2xl font-bold text-slate-100">
+            --
+          </div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 p-4 rounded-lg">
+          <div class="text-xs text-slate-400 mb-1">ENTITIES EXTRACTED</div>
+          <div id="stat-entities" class="text-2xl font-bold text-cyan-400">
+            --
+          </div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 p-4 rounded-lg">
+          <div class="text-xs text-slate-400 mb-1">CORRELATED RELATIONS</div>
+          <div
+            id="stat-relationships"
+            class="text-2xl font-bold text-indigo-400"
+          >
+            --
+          </div>
+        </div>
+        <div
+          class="bg-slate-900 border border-slate-800 p-4 rounded-lg flex justify-between items-center"
+        >
+          <div>
+            <div class="text-xs text-slate-400 mb-1">
+              ILLUSTRATIVE RISK SCORE
+            </div>
+            <div id="stat-risk-score" class="text-2xl font-bold text-slate-500">
+              --/100
+            </div>
+          </div>
+          <div
+            id="risk-badge"
+            class="text-xs px-2 py-1 rounded bg-slate-800 border border-slate-700 text-slate-400"
+          >
+            UNANALYZED
+          </div>
+        </div>
+      </div>
+
+      <!-- LEFT COLUMN: RISK SIGNALS & INTEGRITY -->
+      <div class="col-span-12 lg:col-span-4 flex flex-col gap-6">
+        <!-- RISK SIGNALS PANEL -->
+        <div
+          class="bg-slate-900 border border-slate-800 rounded-lg p-4 flex-1 flex flex-col"
+        >
+          <h2
+            class="text-sm font-bold text-cyan-400 border-b border-slate-800 pb-2 mb-3 flex items-center justify-between"
+          >
+            <span>CORRELATION & RISK SIGNALS</span>
+            <span class="text-[10px] text-slate-500 uppercase"
+              >Explainable Heuristics</span
+            >
+          </h2>
+          <div
+            id="signals-list"
+            class="space-y-3 overflow-y-auto max-h-[380px] pr-1"
+          >
+            <p class="text-xs text-slate-500 italic">
+              Click "LOAD SYNTHETIC EVIDENCE" to run rule evaluation engine.
+            </p>
+          </div>
+        </div>
+
+        <!-- SHA-256 PROVENANCE PANEL -->
+        <div class="bg-slate-900 border border-slate-800 rounded-lg p-4">
+          <h2
+            class="text-sm font-bold text-slate-300 border-b border-slate-800 pb-2 mb-3"
+          >
+            EVIDENCE PROVENANCE (SHA-256)
+          </h2>
+          <div class="space-y-2 text-xs">
+            <div>
+              <span class="text-slate-500">Source File:</span>
+              <span id="sha-file" class="text-slate-300 ml-2">--</span>
+            </div>
+            <div>
+              <span class="text-slate-500">SHA-256 Digest:</span>
+              <div
+                id="sha-hash"
+                class="font-mono text-[11px] text-emerald-400 break-all bg-slate-950 p-2 rounded border border-slate-800/80 mt-1"
+              >
+                ----------------------------------------------------------------
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CENTER COLUMN: NETWORK GRAPH -->
+      <div
+        class="col-span-12 lg:col-span-8 bg-slate-900 border border-slate-800 rounded-lg p-4 flex flex-col h-[560px]"
+      >
+        <div
+          class="flex justify-between items-center border-b border-slate-800 pb-2 mb-2"
+        >
+          <h2 class="text-sm font-bold text-cyan-400">
+            ENTITY RELATIONSHIP GRAPH
+          </h2>
+          <div class="flex items-center gap-2 text-[10px] text-slate-400">
+            <span class="flex items-center gap-1"
+              ><span class="w-2 h-2 rounded-full bg-cyan-500"></span>Phone</span
+            >
+            <span class="flex items-center gap-1"
+              ><span class="w-2 h-2 rounded-full bg-orange-500"></span
+              >IMEI</span
+            >
+            <span class="flex items-center gap-1"
+              ><span class="w-2 h-2 rounded-full bg-emerald-500"></span
+              >UPI</span
+            >
+            <span class="flex items-center gap-1"
+              ><span class="w-2 h-2 rounded-full bg-red-500"></span>IP</span
+            >
+          </div>
+        </div>
+        <div
+          id="cy"
+          class="flex-1 w-full bg-slate-950 rounded border border-slate-800/50 relative"
+        ></div>
+      </div>
+
+      <!-- BOTTOM ROW: TIMELINE & BRIEF -->
+      <div
+        class="col-span-12 lg:col-span-6 bg-slate-900 border border-slate-800 rounded-lg p-4 max-h-[400px] flex flex-col"
+      >
+        <h2
+          class="text-sm font-bold text-cyan-400 border-b border-slate-800 pb-2 mb-3"
+        >
+          CHRONOLOGICAL INVESTIGATIVE TIMELINE
+        </h2>
+        <div
+          id="timeline-container"
+          class="space-y-3 overflow-y-auto pr-2 flex-1 text-xs"
+        >
+          <p class="text-slate-500 italic">No timeline populated.</p>
+        </div>
+      </div>
+
+      <div
+        class="col-span-12 lg:col-span-6 bg-slate-900 border border-slate-800 rounded-lg p-4 max-h-[400px] flex flex-col"
+      >
+        <h2
+          class="text-sm font-bold text-cyan-400 border-b border-slate-800 pb-2 mb-3"
+        >
+          AUTOMATED INVESTIGATIVE BRIEF
+        </h2>
+        <label for="brief-text" class="sr-only"
+          >Automated investigative brief</label
+        >
+        <textarea
+          id="brief-text"
+          name="brief-text"
+          readonly
+          title="Automated investigative brief"
+          placeholder="Awaiting analysis output..."
+          class="w-full flex-1 bg-slate-950 border border-slate-800 rounded p-3 text-[11px] font-mono text-slate-300 resize-none focus:outline-none"
+        >
+Awaiting analysis output...
+            </textarea
+        >
+      </div>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
